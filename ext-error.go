@@ -60,10 +60,6 @@ func (e Error) ErrField() string {
 	return e.Field
 }
 
-func (e Error) Instance() Error {
-	return e
-}
-
 func (e Error) MarshalJSON() ([]byte, error) {
 	return json.Marshal(e)
 }
