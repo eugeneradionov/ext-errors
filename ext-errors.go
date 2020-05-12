@@ -45,7 +45,16 @@ func (errs Errors) Len() int {
 }
 
 func (errs Errors) MarshalJSON() ([]byte, error) {
-	return json.Marshal(errs)
+	e := make([]Error, errs.Len())
+	for i, err := range errs.Errs {
+		e[i] = Error{
+			Message:     err.ErrMessage(),
+			Description: err.ErrDescription(),
+			Field:       err.ErrField(),
+		}
+	}
+
+	return json.Marshal(e)
 }
 
 func (errs Errors) Error() string {

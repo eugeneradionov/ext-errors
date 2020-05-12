@@ -2,6 +2,7 @@ package exterrors
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -17,6 +18,9 @@ type ExtError interface {
 
 	// ErrMessage contains error message if any.
 	ErrMessage() string
+
+	// ErrDescription returns error detailed info.
+	ErrDescription() string
 
 	// ErrField describes in which field an error has occurred if any.
 	// For example JSON field in the HTTP request body.
@@ -40,12 +44,12 @@ type Error struct {
 	// Field describes in which field an error has occurred if any.
 	// For example JSON field in the HTTP request body.
 	// Typically is used for pointing an invalid field during validation.
-	Field string `json:"filed,omitempty"`
+	Field string `json:"field,omitempty"`
 }
 
 // Error unifying Error with Go's error interface.
 func (e Error) Error() string {
-	return e.Description
+	return fmt.Sprintf("%s: %s", e.Message, e.Description)
 }
 
 func (e Error) HTTPCode() int {
@@ -56,12 +60,26 @@ func (e Error) ErrMessage() string {
 	return e.Message
 }
 
+func (e Error) ErrDescription() string {
+	return e.Description
+}
+
 func (e Error) ErrField() string {
 	return e.Field
 }
 
 func (e Error) MarshalJSON() ([]byte, error) {
-	return json.Marshal(e)
+	return json.Marshal(
+		&struct {
+			Message     string `json:"message,omitempty"`
+			Description string `json:"description,omitempty"`
+			Field       string `json:"field,omitempty"`
+		}{
+			Message:     e.Message,
+			Description: e.Description,
+			Field:       e.Field,
+		},
+	)
 }
 
 // NewError returns new ExtError with filled Message, Description and Field.
