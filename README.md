@@ -1,5 +1,8 @@
 # ext-errors
 Package `exterrors` provides extended error handling primitives to add a bit more info to errors returning from the function.
+```
+go get github.com/eugeneradionov/ext-errors
+```
 
 ## Motivation
 In every API that handles HTTP requests, we need to work with error handling.
